@@ -141,7 +141,7 @@ namespace Data.Player.Scripts.Movement.Controller
 
         private void StrafeWallMove()
         {
-            if (_jumpButtonPressed)
+            if (_jumpButtonPressed && _inputPlayer != Vector2.zero)
             {
                 OnWallJump();
                 return;

@@ -1,6 +1,6 @@
 using System.Collections;
+using Data.Common.Timer;
 using Data.Player.Scripts.Movement.Controller.Enums;
-using DG.Tweening;
 using UnityEngine;
 
 namespace Data.Player.Scripts.Movement.Controller
@@ -9,38 +9,30 @@ namespace Data.Player.Scripts.Movement.Controller
     {
         private void StartBigJumpFromSitPointTimer()
         {
-            float timer = 0f;
-
             _canDoBigJumpFromSitPoint = true;
-            
-            DOTween.To(() => timer, x => timer = x, 1f, DurationToBigJump)
-                .SetEase(Ease.Linear)
-                .OnComplete(() => _canDoBigJumpFromSitPoint = false);
+            Timer.StartTimer(DurationToBigJump , () => _canDoBigJumpFromSitPoint = false);
         }
         
         private void SitMovement()
         {
+            _playerState = States.Idle;
             TryToDoBigJump();
         }
         
         private void TryToDoBigJump()
         {
-            {
-                if (_jumpButtonPressed && _sitJumpFromSitPointStarted == false)
-                {
-                    StartCoroutine(SitBigJumpCoroutine());
-                }
+            if (_jumpButtonPressed && _isSitPointColliding)
+            { 
+                StartCoroutine(SitJumpCoroutine());
             }
         }
         
-        private IEnumerator SitBigJumpCoroutine()
+        private IEnumerator SitJumpCoroutine()
         {
             _isSitPointColliding = false;
             
             float elapsedTime = 0f;
             float maxTime = 0.1f;
-            
-            _sitJumpFromSitPointStarted = true;
 
             float currentHorizontalSpeed = SitBigJumpHorizontalSpeed;
             
@@ -73,7 +65,6 @@ namespace Data.Player.Scripts.Movement.Controller
 
             
             _currentHorizontalSpeed = Mathf.Clamp(_playerHorizontalVelocity.magnitude, currentHorizontalSpeed, currentHorizontalSpeed) * currentMultiplier;
-            _sitJumpFromSitPointStarted = false;
         }
     }
 }

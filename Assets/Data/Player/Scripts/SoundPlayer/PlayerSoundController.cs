@@ -1,5 +1,4 @@
 using System;
-using Data.Player.Scripts.Movement.AnimationController;
 using Data.Player.Scripts.Movement.Controller;
 using UnityEngine;
 
@@ -21,8 +20,10 @@ namespace Data.Player.Scripts.SoundPlayer
         {
             PlayerController.StartSwingingAction += () => PlaySound(webShooterSoundClip);
             PlayerController.StartAirMovement += () => PlaySound(trickSoundClip);
+            PlayerController.StartAirAccelerating += () => PlaySound(webShooterSoundClip);
+            PlayerController.StartProjectileFlyToSitPoint += () => PlaySound(webShooterSoundClip);
         }
-        
+
         private void PlaySound(AudioClip clip)
         {
             _audioSource.clip = clip;
@@ -32,6 +33,9 @@ namespace Data.Player.Scripts.SoundPlayer
         private void OnDisable()
         {
             PlayerController.StartSwingingAction -= () => PlaySound(webShooterSoundClip);
+            PlayerController.StartAirMovement -= () => PlaySound(trickSoundClip);
+            PlayerController.StartAirAccelerating -= () => PlaySound(webShooterSoundClip);
+            PlayerController.StartProjectileFlyToSitPoint -= () => PlaySound(webShooterSoundClip);
         }
     }
 }

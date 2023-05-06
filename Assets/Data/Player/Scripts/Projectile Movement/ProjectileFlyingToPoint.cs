@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Data.Buildings.SitPoint;
 using Data.Buildings.SitPoint.Scripts;
+using Data.Common.VisibilityChecker;
 using Data.Player.Scripts.Movement.Controller;
 using UnityEngine;
 
@@ -12,37 +12,33 @@ namespace Data.Player.Scripts.Projectile_Movement
     [RequireComponent(typeof(PlayerController))]
     public class ProjectileFlyingToPoint : MonoBehaviour
     {
+        [SerializeField] private float flySpeed = 35f;
+        [SerializeField] private float smoothRotationTime = 10f;
+        [SerializeField] private LayerMask obstacleLayers;
+        
         private PlayerController _playerController;
         private GameInput.PlayerActions _playerActions; 
             
         private ProjectileMovement _projectileMovement;
-
-        [SerializeField] private float flySpeed = 35f;
-        [SerializeField] private float smoothRotationTime = 10f;
-        [SerializeField] private LayerMask obstacleLayers;
-
         private const float MinDistanceToFly = 15f;
         private const float MaxDistanceToFly = 50f;
 
         private static List<SitPoint> _points = new List<SitPoint>();
         private SitPoint _mainPoint;
+        private Camera _camera;
         private void Awake()
         {
             _playerController = GetComponent<PlayerController>();
+            _camera = Camera.main;
+        }
+
+
+        private void Start()
+        {
             _playerActions = _playerController.GetPlayerButtonActions();
-            
             _projectileMovement = _playerController.GetProjectileMovement();
-        }
-
-
-        private void OnEnable()
-        {
+            
             _playerActions.Zip.started += context => TryToFlyToPoint();
-        }
-
-        private void OnDisable()
-        {
-            _playerActions.Zip.started -= context => TryToFlyToPoint();
         }
 
         private void Update()
@@ -73,7 +69,7 @@ namespace Data.Player.Scripts.Projectile_Movement
 
         private void OnProjectileMovementToPointCompleted()
         {
-            PlayerController.FinishProjectileFlyToSitPoint.Invoke();
+            PlayerController.StopProjectileFlyToSitPoint.Invoke();
         }
 
         private SitPoint CalculateTheBestArrivePoint()
@@ -84,6 +80,11 @@ namespace Data.Player.Scripts.Projectile_Movement
                 List<float> preferedPointDistances = new List<float>();
                 foreach (var point in _points)
                 {
+                    if (VisibilityChecker.IsVisibleOnCamera(_camera, point.gameObject) == false)
+                    {
+                        continue;
+                    }
+                    
                     float distance = Vector3.Distance(point.transform.position, transform.position);
 
                     if (distance > MaxDistanceToFly || distance < MinDistanceToFly)
@@ -138,8 +139,13 @@ namespace Data.Player.Scripts.Projectile_Movement
 
         public static void AddPoint(SitPoint point)
         {
+            if (_points.Find((sitPoint => sitPoint == point)))
+            {
+                return;
+            }
             _points.Add(point);
         }
+        
         
         public static void RemovePoint(SitPoint point)
         {

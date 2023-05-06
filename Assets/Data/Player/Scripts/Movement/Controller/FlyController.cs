@@ -1,4 +1,5 @@
 using System.Collections;
+using Data.Common.Timer;
 using Data.Player.Scripts.Movement.Controller.Enums;
 using UnityEngine;
 
@@ -8,7 +9,7 @@ namespace Data.Player.Scripts.Movement.Controller
     {
         private void TryToStartSwinging()
         {
-            if (!_isGrounded && !_isSwinging)
+            if (!_isGrounded && _canSwing)
             {
                 var hitOrNull = swingingRays.GetTheBestRayHit();
                 
@@ -28,15 +29,12 @@ namespace Data.Player.Scripts.Movement.Controller
                 projectileMovement.hitPoint.position = lastRayHit.point;
 
                 _swingingRopeLenght = lastRayHit.distance;
-
-                //float maxY = transform.position.y + _swingingRopeLenght;
+                
                 float maxY = lastRayHit.point.y;
 
                 Vector3 maxPointPosition = lastRayHit.point + (finalPointDirection * _swingingRopeLenght);
 
                 maxPointPosition = transform.position + (finalPointDirection * _swingingRopeLenght * 2 * ropeLenghtMultiplier);
-
-                //Vector3 maxPointPosition = transform.position +  (finalPointDirection   * (_swingingRopeLenght - maxYDistance));
 
                 if (_currentVerticalPositiveSpeed < 1)
                 {
@@ -53,10 +51,6 @@ namespace Data.Player.Scripts.Movement.Controller
 
                 Vector3 finalPointPosition = (maxPointPosition * flyXSpeedMultiplier * _currentHorizontalSpeed * _currentVerticalPositiveSpeed);
                 
-                
-                //finalPointPosition.x = Mathf.Clamp(finalPointPosition.x, maxPointPosition.x, maxPointPosition.x);
-                //finalPointPosition.z = Mathf.Clamp(finalPointPosition.z,  maxPointPosition.z, maxPointPosition.z);
-
                 var startPointPosition = transform.position;
                 finalPointPosition = maxPointPosition;
                 
@@ -64,15 +58,12 @@ namespace Data.Player.Scripts.Movement.Controller
                 projectileMovement.SetStartSpeed(new Vector2(_currentHorizontalSpeed , _playerVerticalVelocity));
                 projectileMovement.SetHeight(_swingingRopeLenght * ropeHeightConst);
                 
-                
                 _playerState = States.Swing;
                 
                 CalculateMainHand();
                 projectileMovement.StartMoving(startPointPosition , finalPointPosition);
                 
                 StartSwingingAction?.Invoke();
-                
-                
                 
                 _isSwinging = true;
             }
@@ -83,7 +74,6 @@ namespace Data.Player.Scripts.Movement.Controller
             if (_isSwinging)
             {
                 StopProjectileMovement?.Invoke();
-                StopSwinging();
             }
         }
         
@@ -93,15 +83,27 @@ namespace Data.Player.Scripts.Movement.Controller
             {
                 var newSpeed = projectileMovement.GetFinalSpeed();
 
-                _currentHorizontalSpeed = newSpeed.x * afterSwingingHorizontalSpeedMultiplier;
-                _currentVerticalPositiveSpeed = MaxFlyVerticalSpeed * projectileMovement.GetFromZeroToOnePathValue();
+                float zeroToOneParabolaPathCompleted = projectileMovement.GetFromZeroToOnePathValue();
 
+                truePlayerY = 0;
                 
+                if (zeroToOneParabolaPathCompleted <= 0.2f)
+                {
+                    _currentHorizontalSpeed = newSpeed.x;
+                }
+                else
+                {
+                    _currentHorizontalSpeed = newSpeed.x * afterSwingingHorizontalSpeedMultiplier;
+                }
+                _currentVerticalPositiveSpeed = MaxFlyVerticalSpeed * zeroToOneParabolaPathCompleted;
+
                 _isSwinging = false;
-                
+
                 _playerVerticalVelocity = newSpeed.y;
-                
+
                 StopSwingingAction?.Invoke();
+
+                Timer.StartTimer(ToSwingCullDown, () => _canSwing = true);
             }
         }
 
@@ -123,8 +125,6 @@ namespace Data.Player.Scripts.Movement.Controller
             }
 
             projectileMovement.UpdateTrueHeight(truePlayerY, shouldControlHeight);
-
-            UnityEngine.Debug.DrawRay(groundCheckerPosition.position , Vector3.down * 1.5f);
         }
 
 
@@ -132,12 +132,13 @@ namespace Data.Player.Scripts.Movement.Controller
         private void RotateToSwingPoint()
         {
             float smoothAngle;
+            float targetAngle = 0f;
             if (_isSwinging)
             {
                 Vector3 directionToTarget = (projectileMovement.hitPoint.position - transform.position);
                
                 
-                var targetAngle = Vector3.Angle(transform.up, directionToTarget);
+                targetAngle = Vector3.Angle(transform.up, directionToTarget);
                 
                 float dot = Vector3.Dot(transform.right, directionToTarget);
                 
@@ -145,13 +146,9 @@ namespace Data.Player.Scripts.Movement.Controller
                 {
                     targetAngle = -targetAngle;
                 }
+            }
 
-                smoothAngle = Mathf.LerpAngle(playerMesh.localRotation.eulerAngles.z, targetAngle, swingingSmoothTime);
-            }
-            else
-            {
-                smoothAngle = Mathf.LerpAngle(playerMesh.localRotation.eulerAngles.z, 0, swingingSmoothTime);
-            }
+            smoothAngle = Mathf.LerpAngle(playerMesh.localRotation.eulerAngles.z, targetAngle, swingingSmoothTime * Time.deltaTime);
             
             playerMesh.localRotation = Quaternion.Euler(0f, 0f, smoothAngle);
 
@@ -159,17 +156,20 @@ namespace Data.Player.Scripts.Movement.Controller
         
         private void FlyMovement()
         {
-            ControlSwingHeight();
+            if (_isSwinging)
+            {
+                ControlSwingHeight();
+            }
+            
             RotateToSwingPoint();
 
-            if (_playerActions.Action.IsPressed() && _canSwing)
+            if (_playerActions.Action.IsPressed())
             {
                 TryToStartSwinging();
             }
             
             if (_isSwinging == false)
             {
-
                 if (_trickButtonPressed)
                 {
                     turnFlySmoothValue = Mathf.Lerp(turnFlySmoothValue , turnTrickTime , 100 * Time.deltaTime);
@@ -189,10 +189,9 @@ namespace Data.Player.Scripts.Movement.Controller
                 {
                     _playerHorizontalVelocity =Vector3.Lerp(_playerHorizontalVelocity , moveDir.normalized * _currentHorizontalSpeed , turnFlySmoothValue);
                 }
-                
+
                 CheckWallJump();
                 
-
                 if (_currentHorizontalSpeed < MinFlyHorizontalSpeed)
                 {
                     if (_inputPlayer.magnitude >= 0.1f)
@@ -205,20 +204,20 @@ namespace Data.Player.Scripts.Movement.Controller
                     _currentHorizontalSpeed = Mathf.Lerp(_currentHorizontalSpeed, MinFlyHorizontalSpeed, Time.deltaTime * slowFlySpeedTime);
                 }
                 
-                
                 if (_playerState != States.Air)
                 {
-                    StartAirMovement?.Invoke();
-
+                    if (_playerState != States.AirAcceleration)
+                    {
+                        StartAirMovement?.Invoke();
+                    }
                     _playerState = States.Air;
+
                 }
                 
                 
             }
             
         }
-
-        
 
         private void CheckWallJump()
         {
@@ -229,9 +228,7 @@ namespace Data.Player.Scripts.Movement.Controller
                 }
             }
         }
-
-
-
+        
         private void SetControlPositionY()
         {
             if (_canSetControlPositionY)
@@ -246,7 +243,7 @@ namespace Data.Player.Scripts.Movement.Controller
             if (IsAbleToAcceleration())
             {
                 CalculateMainHand();
-                StartAirAccelerating?.Invoke();
+                StartAirAccelerating.Invoke();
                 StartCoroutine(AirAccelerationCoroutine());
             }
         }
@@ -273,10 +270,11 @@ namespace Data.Player.Scripts.Movement.Controller
                 return false;
             }
 
-            if (_isSitPointColliding)
+            if (_isProjectileMovement || _isSitPointColliding)
             {
                 return false;
             }
+            
 
             return true;
         }
@@ -287,22 +285,19 @@ namespace Data.Player.Scripts.Movement.Controller
 
             while (elapsedTime < airAccelerationTime)
             {
-                
                 _playerHorizontalVelocity += (_playerHorizontalVelocity.normalized * (airAccelerationHorizontalSpeed * airAccelerationSpeedMultiplier));
                 _playerVerticalVelocity = airAccelerationVerticalSpeed;
                 _playerState = States.AirAcceleration;
                 
                 elapsedTime += Time.deltaTime;
                 yield return null;
-
             }
-
             _currentHorizontalSpeed = _playerHorizontalVelocity.magnitude * afterAirAccelerationMultiplier;
         }
 
         private void TryToCreateAirTrick()
         {
-            if (_playerState == States.Air)
+            if (_playerState == States.Air && _isProjectileMovement == false)
             {
                 StartAirTrick?.Invoke();
             }

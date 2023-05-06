@@ -6,6 +6,7 @@ namespace Data.Player_Camera.Scripts.Enums
         Swing,
         Wall,
         Air,
-        FastFalling
+        FastFalling,
+        Sit
     }
 }

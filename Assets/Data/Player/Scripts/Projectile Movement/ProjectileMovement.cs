@@ -133,16 +133,8 @@ namespace Data.Player.Scripts.Projectile_Movement
             _movementGroundDirection = new Vector3(_movementDirection.x, 0, _movementDirection.z);
         
             _targetPosition = new Vector3(_movementGroundDirection.magnitude , _movementDirection.y , 0);
-        
-            //float height = targetPos.y + targetPos.magnitude / 2f;
-            height = Mathf.Max(0.01f, height);
-
-
-            // if (heightControl)
-            {
-                // height = Mathf.Lerp(height, 0.1f, 5 * Time.deltaTime);
-            }
             
+            height = Mathf.Max(0.01f, height);
 
             if (_canMove)
             {
@@ -170,12 +162,12 @@ namespace Data.Player.Scripts.Projectile_Movement
                 float y = (_v0 * _currentTime * Mathf.Sin(_angle) - (1f / 2f) * -WorldSettings.Gravity * Mathf.Pow(_currentTime, 2));
             
                 Vector3 defaultPathCalculation = startPoint.position + _movementGroundDirection.normalized * x + flipParabolaVector * y;
-            
+
                 if (heightControl)
                 {
                     if (defaultPathCalculation.y >= movableObject.transform.position.y)
                     {
-                        movableObject.transform.position = startPoint.position + _movementGroundDirection.normalized * x + flipParabolaVector * y;  
+                        movableObject.transform.position = defaultPathCalculation;  
                     }
                     else
                     {
@@ -189,7 +181,16 @@ namespace Data.Player.Scripts.Projectile_Movement
 
                 else
                 {
-                    movableObject.transform.position = defaultPathCalculation;
+                    if (_trueObjectY <  movableObject.transform.position.y)
+                    {
+                        movableObject.transform.position = defaultPathCalculation;
+                    }
+                    else
+                    {
+                        movableObject.transform.position =
+                            new Vector3(startPoint.position.x + _movementGroundDirection.normalized.x * x, _trueObjectY,
+                                startPoint.position.z + _movementGroundDirection.normalized.z * x);
+                    }
                 }
                 
                 if (!_speedIsConst)

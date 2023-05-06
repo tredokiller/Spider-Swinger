@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3193517536433424528
 MeshFilter:
@@ -96,8 +96,16 @@ BoxCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1204058134095011215}
   m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
   m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 0.3787948, y: 0.38085276, z: 1.0808594}
-  m_Center: {x: -0.09339468, y: -0.10158785, z: 0.5404301}
+  serializedVersion: 3
+  m_Size: {x: 0.37750977, y: 0.37258932, z: 1.0808594}
+  m_Center: {x: -0.09555375, y: -0.10207506, z: 0.5404301}

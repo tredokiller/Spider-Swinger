@@ -83,7 +83,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _IntersectionThresholdMax: 0.015
+    - _IntersectionThresholdMax: 0.025
     - _Invert: 0
     - _Magnitude: 0
     - _MainDistort: 0

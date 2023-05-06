@@ -32,7 +32,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 0
+  m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &1599216152260937880
 MeshFilter:
@@ -99,5 +99,5 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.557067, y: 0.29659432, z: 0.360689}
-  m_Center: {x: -0.18229751, y: -0.16057694, z: 0.18034461}
+  m_Size: {x: 0.5549396, y: 0.2891365, z: 0.3611503}
+  m_Center: {x: -0.18246189, y: -0.16097505, z: 0.18057528}

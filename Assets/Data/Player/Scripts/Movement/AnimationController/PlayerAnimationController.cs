@@ -30,7 +30,7 @@ namespace Data.Player.Scripts.Movement.AnimationController
 
         [SerializeField] private float minSpeedToFastFalling = 7f;
 
-        private int swingingAnimationValue;
+        private int swingingAnimationValue = 1;
 
         private bool _isLowDistanceToGround;
         private bool _isFastFallingDown;
@@ -62,9 +62,11 @@ namespace Data.Player.Scripts.Movement.AnimationController
         private static readonly int AirTrick = Animator.StringToHash("AirTrick");
         private static readonly int SitOnPointDefault = Animator.StringToHash("SitOnPointDefault");
         private static readonly int SitOnPointRoll = Animator.StringToHash("SitOnPointRoll");
+        private static readonly int ImmediatelySitOnPoint = Animator.StringToHash("ImmediatelySitOnPoint");
         
         [Header("Actions")]
         public static Action StartFastFalling;
+        public static Action StartImmediatelySitOnPoint;
 
         private static readonly int FastFallingDown = Animator.StringToHash("FastFallingDown");
         
@@ -86,7 +88,7 @@ namespace Data.Player.Scripts.Movement.AnimationController
             PlayerController.StartFlyToSitPointDefault += () => ActivateSitOnPointDefaultTrigger(SitOnPointDefault);
             PlayerController.StartFlyToSitPointRoll += () => ActivateSitOnPointDefaultTrigger(SitOnPointRoll);
             
-            PlayerController.FinishProjectileFlyToSitPoint += ResetCanActivateTriggers;
+            PlayerController.StopProjectileFlyToSitPoint += ResetCanActivateTriggers;
             
             PlayerController.StartAirAccelerating += ActivateAirAccelerationTrigger;
 
@@ -96,6 +98,7 @@ namespace Data.Player.Scripts.Movement.AnimationController
             PlayerController.StopAirTrick += ResetAirTrickTrigger;
 
             StartFastFalling += ActivateFastFallingTrigger;
+            StartImmediatelySitOnPoint += () => ActivateSitOnPointDefaultTrigger(ImmediatelySitOnPoint);
 
             ProjectileJump.StartJumpingFromBuilding += ActivateJumpFromBuildingTrigger;
         }
@@ -155,7 +158,7 @@ namespace Data.Player.Scripts.Movement.AnimationController
                _animator.SetFloat(PositionX, inputPlayer.x);
                _animator.SetFloat(PositionY, inputPlayer.y);
                
-               if (_playerController.GetPlayerCurrentHorizontalSpeed() < minSpeedToFastFalling && _isLowDistanceToGround == false && _playerController.GetPlayerCurrentVerticalSpeed() <= 0)
+               if (_playerController.GetPlayerCurrentHorizontalSpeed() < minSpeedToFastFalling && _isLowDistanceToGround == false && _playerController.GetPlayerCurrentVerticalSpeed() <= -2)
                {
                    if (_isFastFallingDown == false)
                    {

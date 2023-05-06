@@ -7,24 +7,22 @@ namespace Data.Player.Scripts.Movement.Controller
     {
         private void Awake()
         {
-            _gameInput = new GameInput();
             _camera = Camera.main;
 
             _groundSpeed = GroundSpeed.Jog;
             
             _controller = GetComponent<CharacterController>();
 
-            _playerActions = _gameInput.Player;
+            _playerActions = inputManager.GetPlayerActions();
             
             _playerRadius = _controller.radius;
             
             BindInputToFunctions();
-            BindActions();
         }
         
         private void OnEnable()
         {
-            _gameInput.Enable();
+            BindActions();
         }
         
         void Update()
@@ -62,8 +60,6 @@ namespace Data.Player.Scripts.Movement.Controller
             _playerActions.Run.started += context => _runButtonPressed = true;
             _playerActions.Run.canceled += context => _runButtonPressed = false;
 
-            _playerActions.Action.started += context => _canSwing = true;
-
             _playerActions.AdditionalMovement.started += context => _walkButtonPressed = true;
             _playerActions.AdditionalMovement.canceled += context => _walkButtonPressed = false;
 
@@ -76,11 +72,27 @@ namespace Data.Player.Scripts.Movement.Controller
         {
             StartProjectileMovement += () => _isProjectileMovement = true;
             StopProjectileMovement += () => _isProjectileMovement = false;
-            
-            StopProjectileMovement += StopSwinging;
 
-            FinishProjectileFlyToSitPoint += () => _isSitPointColliding = true;
-            FinishProjectileFlyToSitPoint += StartBigJumpFromSitPointTimer;
+            StopProjectileMovement += StopSwinging;
+            
+            StartProjectileFlyToSitPoint += () => _isProjectileMovement = true;
+            StopProjectileFlyToSitPoint += () => _isProjectileMovement = false;
+
+            StopProjectileFlyToSitPoint += () => _isSitPointColliding = true;
+            StopProjectileFlyToSitPoint += StartBigJumpFromSitPointTimer;
+        }
+
+        private void UnBindActions()
+        {
+            StartProjectileMovement -= () => _isProjectileMovement = true;
+            StopProjectileMovement -= () => _isProjectileMovement = false;
+            
+            StopProjectileMovement -= StopSwinging;
+            
+            StartProjectileFlyToSitPoint -= () => _isProjectileMovement = true;
+
+            StopProjectileFlyToSitPoint -= () => _isSitPointColliding = true;
+            StopProjectileFlyToSitPoint -= StartBigJumpFromSitPointTimer;
         }
 
 
@@ -149,7 +161,7 @@ namespace Data.Player.Scripts.Movement.Controller
                 {
                     StartWallClimbing?.Invoke();
                     StopAllCoroutines();
-
+                    StayOnWall();
                     _isWallColliding = true;
                 }
             }
@@ -225,7 +237,7 @@ namespace Data.Player.Scripts.Movement.Controller
             }
             
 
-            if (_isSwinging)
+            if (_isSwinging || _isSitPointColliding)
             {
                 _playerVerticalVelocity = 0f; 
             }
@@ -248,6 +260,7 @@ namespace Data.Player.Scripts.Movement.Controller
                     turnSmoothTime);
 
                 transform.rotation = Quaternion.Euler(0f, angle, 0f);
+                playerMesh.rotation = Quaternion.Euler(0f, transform.rotation.eulerAngles.y, 0f);
             }
             
             
@@ -286,7 +299,7 @@ namespace Data.Player.Scripts.Movement.Controller
         
         private void OnDisable()
         {
-            _gameInput.Disable();
+            UnBindActions();
         }
 
 
@@ -311,9 +324,7 @@ namespace Data.Player.Scripts.Movement.Controller
             }
             _isStaying = false;
         }
-
-
-
+        
         private void CalculateMainHand() //Calculating true hand for swing rope by direction to hit point
         {
             Vector3 directionToTarget = (lastRayHit.point - transform.position);
@@ -329,7 +340,15 @@ namespace Data.Player.Scripts.Movement.Controller
          
             mainHandTransform = leftHandTransform;
             _mainHandDirections = Directions.Left;
+        }
 
+        public void ResetToDefault()
+        {
+            _isSwinging = false;
+            _canSwing = true;
+            _isProjectileMovement = false;
+            _wallJumpIsStarted = false;
+            _isSitPointColliding = false;
         }
     }
 }

@@ -28,38 +28,29 @@ namespace Data.Player.Scripts.Movement.Controller
         private readonly float _jogSpeed = 5f;
         private readonly float _runSpeed = 7f;
         
-
         private GroundSpeed _groundSpeed;
-        
         
         private float _currentHorizontalSpeed;
         private float _currentVerticalPositiveSpeed;
         
-        private readonly float jumpHeight = 10f;
-        
-        
+        private readonly float jumpHeight = 20f;
         
         [Header("Rotation")]
-        private float _turnSmoothVelocity;
-
         [SerializeField] private float turnSmoothTime = 2;
         [SerializeField] private float projectileTurnSmoothTime = 1;
         [SerializeField] private float swingingSmoothTime;
-
+        
+        private float _turnSmoothVelocity;
         private float _targetAngle;
-
-
-
+        
         [Header("WallProperties")] 
         [SerializeField] private LayerMask buildingsMask;
 
         private bool _wallJumpIsStarted;
-
         public bool ShouldInvertWallAnimations { get; private set; }
         
         [SerializeField] private Transform wallCheckPosition;
-
-
+        
         [SerializeField] private float wallJumpUpForce;
         [SerializeField] private float wallJumpSideForce;
 
@@ -74,15 +65,14 @@ namespace Data.Player.Scripts.Movement.Controller
         private const float WallClimbingSpeed = 10f;
         private const float WallRunSpeed = 15f;
         
-        
         private bool _isWallColliding;
-
-
+        
         [Header("FlyProperties")]
         public bool shouldControlHeight;
         
         private RaycastHit lastRayHit;
 
+        private const float ToSwingCullDown = 0.8f;
         [SerializeField] private float flyYSpeedMultiplier;
         [SerializeField] private float flyXSpeedMultiplier;
 
@@ -90,24 +80,20 @@ namespace Data.Player.Scripts.Movement.Controller
 
         [SerializeField] private float afterSwingingHorizontalSpeedMultiplier;
         
-        [SerializeField] private float trueDistanceFromGroundToPlayer;
         [SerializeField] private float truePlayerY;
         
         [SerializeField] private float ropeLenghtMultiplier;
         
-        
         private bool _isSwinging;
         private bool _canSetControlPositionY;
         
-
         private bool _canSwing;
         private bool _canFlyJump;
         private bool _canSpeedUp;
         
         private Vector3 _flyDirection;
-
-
-        public const float MinFlyHorizontalSpeed = 1f;
+        
+        private const float MinFlyHorizontalSpeed = 1f;
         public const float MaxFlyHorizontalSpeed = 30f;
 
         public const float MaxFlyVerticalSpeed = 12f;
@@ -122,8 +108,7 @@ namespace Data.Player.Scripts.Movement.Controller
         [SerializeField] private RayList airAccelerationRays;
         
         [SerializeField] private ProjectileMovement projectileMovement;
-
-
+        
         [Header("AirTricks")] 
         [SerializeField] private float turnTrickTime;
 
@@ -142,15 +127,12 @@ namespace Data.Player.Scripts.Movement.Controller
         [SerializeField] private float airAccelerationSpeedMultiplier;
         
         [Header("Overall")]
-        [SerializeField] private float experimentalValue;
-
         public const string PlayerTag = "Player";
         
         private bool _isProjectileMovement;
         
         public Transform leftHandTransform;
         public Transform rightHandTransform;
-
 
         private Transform mainHandTransform;
         private Directions _mainHandDirections;
@@ -173,17 +155,14 @@ namespace Data.Player.Scripts.Movement.Controller
 
         private Vector2 _inputPlayer;
         
-        
         private bool _isGrounded;
         private bool _isStaying;
-        
-        
+
         private Camera _camera;
-
-
+        
         [SerializeField] private Transform groundCheckerPosition;
-
-        private GameInput _gameInput;
+        
+        [SerializeField] private InputManager inputManager;
         private GameInput.PlayerActions _playerActions;
         
         private CharacterController _controller;
@@ -192,16 +171,12 @@ namespace Data.Player.Scripts.Movement.Controller
 
         [Header("SwingingRopeLenght")]
         private float _swingingRopeLenght;
-
         private readonly Collider[] _wallCollider = new Collider[1];
-
-
-
+        
         [Header("SitPoint")] 
         private bool _isSitPointColliding;
         private bool _canDoBigJumpFromSitPoint;
-        private bool _sitJumpFromSitPointStarted;
-        
+
         private const float DurationToBigJump = 1.5f;
         
         private const float SitBigJumpVerticalSpeed = 15f;
@@ -212,18 +187,34 @@ namespace Data.Player.Scripts.Movement.Controller
         
         private const float SitJumpHorizontalAfterFlyMultiplier = 1.5f;
         private const float SitBigJumpHorizontalAfterFlyMultiplier = 2.5f;
+        
+        [Header("Actions")] 
+        public static Action StartSwingingAction;
+        public static Action StopSwingingAction;
+
+        public static Action StartProjectileMovement;
+        public static Action StopProjectileMovement;
+
+        public static Action StartProjectileFlyToSitPoint;
+        public static Action StopProjectileFlyToSitPoint;
+
+        public static Action StartFlyToSitPointDefault;
+        public static Action StartFlyToSitPointRoll;
+        
+        public static Action StartWallClimbing;
+        public static Action StartAirAccelerating;
+
+        public static Action StartAirMovement;
+        public static Action StartGroundMovement;
+
+        public static Action StartAirTrick;
+        public static Action StopAirTrick;
 
         public Vector3 GetPlayerVelocity()
         {
             return _playerVelocity;
         }
-
-        public Vector3 GetPlayerNormalDirection()
-        {
-            return _direction;
-        }
-
-
+        
         public GameInput.PlayerActions GetPlayerButtonActions()
         {
             return _playerActions;
@@ -233,7 +224,6 @@ namespace Data.Player.Scripts.Movement.Controller
         {
             return _currentHorizontalSpeed;
         }
-
 
         public Vector3 GetPlayerWallRayNormalized()
         {
@@ -254,7 +244,7 @@ namespace Data.Player.Scripts.Movement.Controller
         {
             return projectileMovement;
         }
-
+        
         public GroundSpeed GetGroundSpeed()
         {
             return _groundSpeed;
@@ -315,29 +305,5 @@ namespace Data.Player.Scripts.Movement.Controller
             return _isProjectileMovement;
         }
         
-        [Header("Actions")] 
-        public static Action StartSwingingAction;
-        public static Action StopSwingingAction;
-
-        public static Action StartProjectileMovement;
-        public static Action StopProjectileMovement;
-
-        public static Action StartProjectileFlyToSitPoint;
-        public static Action FinishProjectileFlyToSitPoint;
-
-        public static Action StartFlyToSitPointDefault;
-        public static Action StartFlyToSitPointRoll;
-        
-        public static Action StartWallClimbing;
-        public static Action StartAirAccelerating;
-
-        public static Action StartAirMovement;
-        public static Action StartGroundMovement;
-
-        public static Action StartAirTrick;
-        public static Action StopAirTrick;
-
-
-
     }
 }

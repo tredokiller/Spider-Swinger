@@ -1,5 +1,5 @@
-using System;
 using Cinemachine;
+using Data.Common.PauseMenu;
 using Data.Player_Camera.Scripts.Enums;
 using Data.Player.Scripts.Movement.AnimationController;
 using Data.Player.Scripts.Movement.Controller;
@@ -9,27 +9,30 @@ namespace Data.Player_Camera.Scripts
 {
     public class CameraSettings : MonoBehaviour
     {
-        [Header("IK")]
+        [Header("IK")] 
         [SerializeField] private Transform headTarget;
 
-        [Header("Camera Modes")]
+        [Header("Camera Modes")] 
         [SerializeField] private CinemachineFreeLook groundCameraMode;
         [SerializeField] private CinemachineFreeLook swingCameraMode;
         [SerializeField] private CinemachineFreeLook wallCameraMode;
         [SerializeField] private CinemachineFreeLook airCameraMode;
         [SerializeField] private CinemachineFreeLook fastFallingCameraMode;
+        [SerializeField] private CinemachineFreeLook sitOnPointCameraMode;
 
-        [Header("Player")]
+        [Header("Player")] 
         [SerializeField] private Transform playerMesh;
 
-        [Header("Rotation")]
+        [Header("Rotation")] 
         [SerializeField] private float rotationToSwingSpeed = 10f;
+        
         private bool _rotateToSwingDirection;
         private const float RotationToSwingMultiplier = 0.3f;
         
-        
         private CameraMode _currentMode;
-        
+
+        private bool _canChangeCameraMode = true;
+
         private void Awake()
         {
             _rotateToSwingDirection = false;
@@ -45,15 +48,23 @@ namespace Data.Player_Camera.Scripts
         private void OnEnable()
         {
             PlayerAnimationController.StartFastFalling += () => SwitchCameraMode(CameraMode.FastFalling);
-            
+
             PlayerController.StartSwingingAction += () => SwitchCameraMode(CameraMode.Swing);
-            
+
             PlayerController.StartSwingingAction += () => _rotateToSwingDirection = true;
             PlayerController.StopSwingingAction += () => _rotateToSwingDirection = false;
-            
+
             PlayerController.StartWallClimbing += () => SwitchCameraMode(CameraMode.Wall);
             PlayerController.StartGroundMovement += () => SwitchCameraMode(CameraMode.Ground);
             PlayerController.StartAirMovement += () => SwitchCameraMode(CameraMode.Air);
+            PlayerController.StopProjectileFlyToSitPoint += () => SwitchCameraMode(CameraMode.Sit);
+
+            
+            MenuManager.OnMenuOpened += () => SetCanChangeCameraMode(false);
+            MenuManager.OnMenuOpened += () => SetOnCameraModes(false);
+            
+            MenuManager.OnMenuClosed += () => SetCanChangeCameraMode(true);
+            MenuManager.OnMenuClosed += () => SwitchCameraMode(_currentMode);
         }
 
         private void OnDisable()
@@ -63,6 +74,12 @@ namespace Data.Player_Camera.Scripts
             PlayerController.StartWallClimbing -= () => SwitchCameraMode(CameraMode.Wall);
             PlayerController.StartGroundMovement -= () => SwitchCameraMode(CameraMode.Ground);
             PlayerController.StartAirMovement -= () => SwitchCameraMode(CameraMode.Air);
+            
+            MenuManager.OnMenuOpened -= () => SetOnCameraModes(false);
+            MenuManager.OnMenuOpened -= () => SetCanChangeCameraMode(false);
+            
+            MenuManager.OnMenuClosed -= () => SetCanChangeCameraMode(true);
+            MenuManager.OnMenuClosed -= () => SwitchCameraMode(_currentMode);
         }
 
 
@@ -76,12 +93,14 @@ namespace Data.Player_Camera.Scripts
             if (_rotateToSwingDirection)
             {
                 float angleToMove = playerMesh.localRotation.eulerAngles.z;
-                
+
                 if (angleToMove > 180f)
                 {
                     angleToMove -= 360;
                 }
-                swingCameraMode.m_Lens.Dutch = Mathf.LerpAngle(swingCameraMode.m_Lens.Dutch, angleToMove * RotationToSwingMultiplier, rotationToSwingSpeed * Time.deltaTime);
+
+                swingCameraMode.m_Lens.Dutch = Mathf.LerpAngle(swingCameraMode.m_Lens.Dutch,
+                    angleToMove * RotationToSwingMultiplier, rotationToSwingSpeed * Time.deltaTime);
             }
             else
             {
@@ -89,40 +108,60 @@ namespace Data.Player_Camera.Scripts
                     Mathf.LerpAngle(swingCameraMode.m_Lens.Dutch, 0, rotationToSwingSpeed * Time.deltaTime);
             }
         }
-        
+
         private void SwitchCameraMode(CameraMode newMode)
         {
             _currentMode = newMode;
+
+            SetOnCameraModes(false);
             
-            groundCameraMode.gameObject.SetActive(false);
-            swingCameraMode.gameObject.SetActive(false);
-            wallCameraMode.gameObject.SetActive(false);
-            airCameraMode.gameObject.SetActive(false);
-            fastFallingCameraMode.gameObject.SetActive(false);
-            
+            if (_canChangeCameraMode == false)
+            {
+                return;
+            }
+
             switch (_currentMode)
             {
                 case CameraMode.Ground:
                     groundCameraMode.gameObject.SetActive(true);
                     break;
-                
+
                 case CameraMode.Swing:
                     swingCameraMode.gameObject.SetActive(true);
                     break;
-                
+
                 case CameraMode.Wall:
                     wallCameraMode.gameObject.SetActive(true);
                     break;
-                
+
                 case CameraMode.Air:
                     airCameraMode.gameObject.SetActive(true);
                     break;
-                
+
                 case CameraMode.FastFalling:
                     fastFallingCameraMode.gameObject.SetActive(true);
                     break;
-                    
+
+                case CameraMode.Sit:
+                    sitOnPointCameraMode.gameObject.SetActive(true);
+                    break;
+
             }
+        }
+
+        private void SetOnCameraModes(bool isActive)
+        {
+            groundCameraMode.gameObject.SetActive(isActive);
+            swingCameraMode.gameObject.SetActive(isActive);
+            wallCameraMode.gameObject.SetActive(isActive);
+            airCameraMode.gameObject.SetActive(isActive);
+            fastFallingCameraMode.gameObject.SetActive(isActive);
+            sitOnPointCameraMode.gameObject.SetActive(isActive);
+        }
+
+        private void SetCanChangeCameraMode(bool canChange)
+        {
+            _canChangeCameraMode = canChange;
         }
     }
 }
