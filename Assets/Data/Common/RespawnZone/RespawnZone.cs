@@ -1,9 +1,7 @@
-using System;
 using Data.Common.SceneLoader.Scripts;
 using Data.Player.Scripts.Movement;
 using Data.Player.Scripts.Movement.Controller;
 using UnityEngine;
-
 namespace Data.Common.Respawn
 {
     public class RespawnZone : MonoBehaviour

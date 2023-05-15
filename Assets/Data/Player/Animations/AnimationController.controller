@@ -2876,7 +2876,7 @@ AnimatorStateTransition:
   m_ExitTime: 0.8582026
   m_HasExitTime: 1
   m_HasFixedDuration: 1
-  m_InterruptionSource: 0
+  m_InterruptionSource: 2
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
 --- !u!1102 &972427127311914019
@@ -3034,9 +3034,6 @@ AnimatorStateTransition:
   m_Conditions:
   - m_ConditionMode: 1
     m_ConditionEvent: IsAirTrick
-    m_EventTreshold: 0
-  - m_ConditionMode: 3
-    m_ConditionEvent: PositionY
     m_EventTreshold: 0
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: 7599863247984464486}
@@ -3471,7 +3468,7 @@ AnimatorStateTransition:
   m_ExitTime: 0.9646243
   m_HasExitTime: 1
   m_HasFixedDuration: 1
-  m_InterruptionSource: 0
+  m_InterruptionSource: 2
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
 --- !u!1101 &3345908824400228615
@@ -4879,7 +4876,7 @@ AnimatorStateTransition:
   m_ExitTime: 0.5714286
   m_HasExitTime: 0
   m_HasFixedDuration: 1
-  m_InterruptionSource: 4
+  m_InterruptionSource: 2
   m_OrderedInterruption: 1
   m_CanTransitionToSelf: 1
 --- !u!1101 &8901413979833619452

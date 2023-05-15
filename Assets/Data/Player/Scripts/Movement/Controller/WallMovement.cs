@@ -109,18 +109,6 @@ namespace Data.Player.Scripts.Movement.Controller
             {
                 StayOnWall();
                 return;
-                
-                var directionVector = (hit.point - _wallRay.point).normalized;
-
-                direction.x = -directionVector.x;
-                direction.y = directionVector.y;
-                direction.z = -directionVector.z;
-                
-                if (_isGrounded)
-                {
-                    _isWallColliding = false;
-                    return;
-                }
             }
 
             UnityEngine.Debug.DrawLine(transform.position + Vector3.up,
@@ -141,14 +129,14 @@ namespace Data.Player.Scripts.Movement.Controller
 
         private void StrafeWallMove()
         {
+            _wallJumpDirection = Directions.Right;
+            
             if (_jumpButtonPressed && _inputPlayer != Vector2.zero)
             {
                 OnWallJump();
                 return;
             }
 
-            _wallJumpDirection = Directions.Right;
-            
             Vector3 crossProd = Vector3.Cross(_wallRay.normal, transform.up);
             
             if ((new Vector3(0, 0,  _direction.z) -crossProd).magnitude >
@@ -181,11 +169,6 @@ namespace Data.Player.Scripts.Movement.Controller
         
         private void OnWallJump()
         {
-            if (_isWallColliding)
-            {
-                StartCoroutine(WallJumpCoroutine());
-                return;
-            }
             StartCoroutine(WallJumpCoroutine());
         }
 
@@ -223,7 +206,7 @@ namespace Data.Player.Scripts.Movement.Controller
                 yield return null;
             }
             
-            _currentHorizontalSpeed = Mathf.Max(_currentHorizontalSpeed, 10f);
+            _currentHorizontalSpeed = Mathf.Max(_currentHorizontalSpeed, 15f);
             _wallJumpIsStarted = false;
         }
 

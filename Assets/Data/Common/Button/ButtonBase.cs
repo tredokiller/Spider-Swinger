@@ -6,7 +6,7 @@ namespace Data.Common.Button
     public class ButtonBase : MonoBehaviour
     {
         private RectTransform _buttonRect;
-        protected UnityEngine.UI.Button Button;
+        private UnityEngine.UI.Button _button;
         
         private Vector3 _defaultScale;
         private Vector3 _selectedScale;
@@ -17,7 +17,7 @@ namespace Data.Common.Button
         private void Awake()
         {
             _buttonRect = GetComponent<RectTransform>();
-            Button = GetComponent<UnityEngine.UI.Button>();
+            _button = GetComponent<UnityEngine.UI.Button>();
 
             _defaultScale = _buttonRect.localScale;
             _selectedScale = _defaultScale * ScaleMultiplier;

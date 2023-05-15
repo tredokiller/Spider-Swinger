@@ -1,4 +1,3 @@
-using System;
 using Data.Common.Button;
 using Data.Settings;
 using TMPro;

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Data.Common.UITransitions
 {
-    public class UITransition : MonoBehaviour
+    public static class UITransition
     {
         public static void MakeTransitionFromTo(RectTransform transitionObjectRect, RectTransform startPoint , RectTransform finishPoint , float duration = 1f)
         {

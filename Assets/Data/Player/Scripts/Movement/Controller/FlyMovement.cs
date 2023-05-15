@@ -11,62 +11,62 @@ namespace Data.Player.Scripts.Movement.Controller
         {
             if (!_isGrounded && _canSwing)
             {
-                var hitOrNull = swingingRays.GetTheBestRayHit();
-                
-                if (hitOrNull == null)
-                {
-                    return;
-                }
-
-                _canSwing = false;
-                
-                lastRayHit = hitOrNull.Value;
-
-                projectileMovement.FlipParabolaVertical(true);
-                
-                Vector3 finalPointDirection = _direction;
-                
-                projectileMovement.hitPoint.position = lastRayHit.point;
-
-                _swingingRopeLenght = lastRayHit.distance;
-                
-                float maxY = lastRayHit.point.y;
-
-                Vector3 maxPointPosition = lastRayHit.point + (finalPointDirection * _swingingRopeLenght);
-
-                maxPointPosition = transform.position + (finalPointDirection * _swingingRopeLenght * 2 * ropeLenghtMultiplier);
-
-                if (_currentVerticalPositiveSpeed < 1)
-                {
-                    maxPointPosition.y = transform.position.y * flyYSpeedMultiplier * _currentHorizontalSpeed * 2.5f;
-                }
-                else
-                {
-                    maxPointPosition.y = transform.position.y * flyYSpeedMultiplier * _currentHorizontalSpeed * _currentVerticalPositiveSpeed; 
-                }
-                
-                
-                
-                maxPointPosition.y = Mathf.Clamp(maxPointPosition.y, transform.position.y, maxY);
-
-                Vector3 finalPointPosition = (maxPointPosition * flyXSpeedMultiplier * _currentHorizontalSpeed * _currentVerticalPositiveSpeed);
-                
-                var startPointPosition = transform.position;
-                finalPointPosition = maxPointPosition;
-                
-
-                projectileMovement.SetStartSpeed(new Vector2(_currentHorizontalSpeed , _playerVerticalVelocity));
-                projectileMovement.SetHeight(_swingingRopeLenght * ropeHeightConst);
-                
-                _playerState = States.Swing;
-                
-                CalculateMainHand();
-                projectileMovement.StartMoving(startPointPosition , finalPointPosition);
-                
-                StartSwingingAction?.Invoke();
-                
-                _isSwinging = true;
+               DoSwinging();
             }
+        }
+
+        private void DoSwinging()
+        {
+            var hitOrNull = swingingRays.GetTheBestRayHit();
+                
+            if (hitOrNull == null)
+            {
+                return;
+            }
+
+            var startPointPosition = transform.position;
+            
+            _canSwing = false;
+            
+            lastRayHit = hitOrNull.Value;
+
+            projectileMovement.FlipParabolaVertical(true);
+            
+            Vector3 finalPointDirection = _direction;
+            
+            projectileMovement.hitPoint.position = lastRayHit.point;
+
+            _swingingRopeLenght = lastRayHit.distance;
+            
+            float maxY = lastRayHit.point.y;
+            
+            Vector3 maxPointPosition = startPointPosition + (finalPointDirection * _swingingRopeLenght * 2 * ropeLenghtMultiplier);
+
+            if (_currentVerticalPositiveSpeed < 1)
+            {
+                maxPointPosition.y = startPointPosition.y * flyYSpeedMultiplier * _currentHorizontalSpeed * 2.5f;
+            }
+            else
+            {
+                maxPointPosition.y = startPointPosition.y * flyYSpeedMultiplier * _currentHorizontalSpeed * _currentVerticalPositiveSpeed; 
+            }
+            
+            maxPointPosition.y = Mathf.Clamp(maxPointPosition.y, startPointPosition.y, maxY);
+            
+            Vector3 finalPointPosition = maxPointPosition;
+            
+
+            projectileMovement.SetStartSpeed(new Vector2(_currentHorizontalSpeed , _playerVerticalVelocity));
+            projectileMovement.SetHeight(_swingingRopeLenght * ropeHeightConst);
+            
+            _playerState = States.Swing;
+            
+            CalculateMainHand();
+            
+            projectileMovement.StartMoving(startPointPosition , finalPointPosition);
+
+            _isSwinging = true;
+            StartSwingingAction?.Invoke();
         }
 
         private void TryToStopSwinging()

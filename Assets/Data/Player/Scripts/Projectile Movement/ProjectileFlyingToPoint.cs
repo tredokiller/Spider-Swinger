@@ -13,7 +13,6 @@ namespace Data.Player.Scripts.Projectile_Movement
     public class ProjectileFlyingToPoint : MonoBehaviour
     {
         [SerializeField] private float flySpeed = 35f;
-        [SerializeField] private float smoothRotationTime = 10f;
         [SerializeField] private LayerMask obstacleLayers;
         
         private PlayerController _playerController;
