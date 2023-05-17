@@ -149,7 +149,6 @@ namespace Data.Player.Scripts.Projectile_Movement
         IEnumerator Coroutine_Movement()
         {
             _currentTime = 0;
-            
             _finalVerticalSpeed = 0;
             
             CalculatePathWithHeight();
@@ -177,8 +176,6 @@ namespace Data.Player.Scripts.Projectile_Movement
                     }
                 }
 
-                //movableObject.transform.position = startPoint.position + _movementGroundDirection.normalized * x;
-
                 else
                 {
                     if (_trueObjectY <  movableObject.transform.position.y)
@@ -193,27 +190,25 @@ namespace Data.Player.Scripts.Projectile_Movement
                     }
                 }
                 
-                if (!_speedIsConst)
+                if (_speedIsConst == false)
                 {
+                    float speedX = (_startedSpeed.x + (_startedSpeed.y * verticalSpeedLerpTimeMultiplier));
                     
                     if (flipParabolaVector != Vector3.up)
                     {
                         _finalVerticalSpeed = Mathf.Lerp(_finalVerticalSpeed, PlayerController.MaxFlyVerticalSpeed,
-                            Time.deltaTime * verticalSpeedLerpTime * (_startedSpeed.x + (_startedSpeed.y * verticalSpeedLerpTimeMultiplier)));
+                            Time.deltaTime * verticalSpeedLerpTime * speedX);
                     }
-                    
                     
                     if (_currentTime <= _time / 2)
                     {
                         _startedSpeed.x = Mathf.Lerp(_startedSpeed.x, PlayerController.MaxFlyHorizontalSpeed,
-                            Time.deltaTime * horizontalSpeedLerpTime * (_startedSpeed.x + (_startedSpeed.y * verticalSpeedLerpTimeMultiplier)));
+                            Time.deltaTime * horizontalSpeedLerpTime * speedX);
                     }
                 }
 
                 _currentTime += Time.deltaTime * speedMultiplier * _startedSpeed.magnitude;
-            
-            
-            
+                
                 yield return null;
             }
         
@@ -251,14 +246,12 @@ namespace Data.Player.Scripts.Projectile_Movement
             
             return clampedValue;
         }
-        
-        
+
         public void SetHeight(float newHeight)
         { 
             height = newHeight;
         }
-
-
+        
         public void SetStartSpeed(Vector2 speed , bool isConst = false)
         {
             _speedIsConst = isConst;

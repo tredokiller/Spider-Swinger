@@ -53,6 +53,8 @@ namespace Data.Player.Scripts.Movement.Controller
         
         [SerializeField] private float wallJumpUpForce;
         [SerializeField] private float wallJumpSideForce;
+        
+        private const float MinWallJumpSideForce = 15f;
 
         [SerializeField] private float smoothWallDirectionLerpTime;
 

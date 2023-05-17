@@ -179,7 +179,6 @@ namespace Data.Player.Scripts.Movement.Controller
                     turnFlySmoothValue = Mathf.Lerp(turnFlySmoothValue , 1 , 0.7f * Time.deltaTime);
                 }
                 
-
                 float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, _targetAngle, ref _turnSmoothVelocity,
                     turnSmoothTime);
             
@@ -211,10 +210,7 @@ namespace Data.Player.Scripts.Movement.Controller
                         StartAirMovement?.Invoke();
                     }
                     _playerState = States.Air;
-
                 }
-                
-                
             }
             
         }
@@ -275,7 +271,6 @@ namespace Data.Player.Scripts.Movement.Controller
                 return false;
             }
             
-
             return true;
         }
 

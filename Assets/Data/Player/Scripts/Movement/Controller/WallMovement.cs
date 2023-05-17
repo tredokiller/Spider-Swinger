@@ -206,7 +206,7 @@ namespace Data.Player.Scripts.Movement.Controller
                 yield return null;
             }
             
-            _currentHorizontalSpeed = Mathf.Max(_currentHorizontalSpeed, 15f);
+            _currentHorizontalSpeed = Mathf.Max(_currentHorizontalSpeed, MinWallJumpSideForce);
             _wallJumpIsStarted = false;
         }
 

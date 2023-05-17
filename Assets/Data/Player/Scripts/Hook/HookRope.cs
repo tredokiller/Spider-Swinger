@@ -1,6 +1,5 @@
 using Data.Player.Scripts.Movement.Controller;
 using Data.Player.Scripts.Movement.Controller.Enums;
-using Data.Player.Scripts.Projectile_Movement;
 using UnityEngine;
 
 namespace Data.Player.Scripts.Hook
@@ -9,22 +8,21 @@ namespace Data.Player.Scripts.Hook
         private Spring spring;
         private LineRenderer lr;
         private Vector3 currentGrapplePosition;
-
-        private ProjectileMovement _projectileMovement;
+        
         private PlayerController _controller;
         
-        public int quality;
-        public float damper;
-        public float strength;
-        public float velocity;
-        public float waveCount;
-        public float waveHeight;
-        public AnimationCurve affectCurve;
+        [SerializeField] private int quality;
+        [SerializeField] private float damper;
+        [SerializeField] private float strength;
+        [SerializeField] private float velocity;
+        [SerializeField] private float waveCount;
+        [SerializeField] private float waveHeight;
+        [SerializeField] private AnimationCurve affectCurve;
     
         void Awake()
         {
             _controller = GetComponent<PlayerController>();
-            _projectileMovement = _controller.GetProjectileMovement();
+            
             lr = GetComponent<LineRenderer>();
             spring = new Spring();
             spring.SetTarget(0);
@@ -45,13 +43,12 @@ namespace Data.Player.Scripts.Hook
                 return;
             }
 
-            if (lr.positionCount == 0) {
+            if (lr.positionCount == 0)
+            {
                 spring.SetVelocity(velocity);
                 lr.positionCount = quality + 1;
             }
-            
-            
-        
+
             spring.SetDamper(damper);
             spring.SetStrength(strength);
             spring.Update(Time.deltaTime);

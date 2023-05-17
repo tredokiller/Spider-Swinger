@@ -1649,7 +1649,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 325460187}
-  m_LocalRotation: {x: 0.21811551, y: 0.0000003018416, z: -0.000000067460576, w: 0.975923}
+  m_LocalRotation: {x: 0.21811551, y: 0.00000031863368, z: -0.000000071213556, w: 0.975923}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -4855,7 +4855,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.106897414, y: 0.00000029896216, z: -0.00000003214245, w: 0.9942701}
+  m_LocalRotation: {x: 0.106897414, y: 0.00000033317775, z: -0.00000003582108, w: 0.9942701}
   m_LocalPosition: {x: 31.997627, y: 198.7, z: 9.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5951,7 +5951,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1184825366}
-  m_LocalRotation: {x: 0.106897384, y: 0.00000030751602, z: -0.000000033062104, w: 0.9942701}
+  m_LocalRotation: {x: 0.106897384, y: 0.0000003246238, z: -0.000000034901422, w: 0.9942701}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -7118,7 +7118,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1358950044}
-  m_LocalRotation: {x: 0.16032642, y: 0.00000047130104, z: -0.00000007655229, w: 0.98706406}
+  m_LocalRotation: {x: 0.16032642, y: 0.0000005164159, z: -0.00000008388019, w: 0.98706406}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -17612,6 +17612,10 @@ PrefabInstance:
     - target: {fileID: 1227113310874296632, guid: 6ea7460257cc9c447ad69393b3092278, type: 3}
       propertyPath: height
       value: 40
+      objectReference: {fileID: 0}
+    - target: {fileID: 2313877411332826721, guid: 6ea7460257cc9c447ad69393b3092278, type: 3}
+      propertyPath: smoothValue
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3563335159749711869, guid: 6ea7460257cc9c447ad69393b3092278, type: 3}
       propertyPath: height

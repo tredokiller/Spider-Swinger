@@ -30,7 +30,7 @@ namespace Data.Player.Scripts.Movement.AnimationController
             if (_cameraSettings)
             {
                 transform.position = Vector3.Lerp(transform.position, _cameraSettings.GetHeadTarget().position,
-                    smoothValue);
+                    smoothValue * Time.deltaTime);
             }
         }
     }
